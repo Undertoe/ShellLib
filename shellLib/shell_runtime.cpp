@@ -37,6 +37,10 @@ int Terryn::ShellRuntime::ExecuteLine(std::string_view line)
         return 0;
         break;
 
+    case Echo:
+        return run_echo(line);
+        break;
+
     case Unknown:
         error.SetError("Unknown type grabbed, exiting");
         return -1;
@@ -389,4 +393,24 @@ int Terryn::ShellRuntime::run_alias(std::string_view line)
     }
 
     return ExecuteLine(toRun);
+}
+
+int Terryn::ShellRuntime::run_echo(std::string_view line)
+{
+    if(StringHelpers::count_delims(line, '\"') != 2)
+    {
+        error.SetError("Invalid format of an echo statement: " + std::string(line));
+        return -1;
+    }
+
+    std::string echoLine = std::string(StringHelpers::find_between_delims(line, '\"'));
+
+    if(echoLine.size() == 0)
+    {
+        error.SetError("Invalid format of an echo statement: " + std::string(line));
+        return -1;
+    }
+
+    _callback->EchoCallback(echoLine);
+    return 0;
 }

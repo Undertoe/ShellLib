@@ -37,6 +37,7 @@ private:
         AliasSet,
         AliasRun,
         Comment,
+        Echo,
         Unknown,
     };
 
@@ -49,6 +50,7 @@ private:
         { "cd", ChangeDirectory},
         { "alias", AliasSet },
         { "#", Comment },
+        { "echo", Echo },
     };
 
 
@@ -70,6 +72,7 @@ private:
     int modify_var(std::string_view line);
     int run_alias(std::string_view line);
     int set_alias(std::string_view line);
+    int run_echo(std::string_view line);
 
     int change_directory(std::string_view line);
     int check_directory();

@@ -133,6 +133,11 @@ public:
         std::cout << std::endl;
     }
 
+    virtual void EchoCallback(const std::string &echo) override
+    {
+        std::cout << "echo: " << echo << std::endl;
+    }
+
     virtual void CDCallBack(const std::string &output, bool successful) override
     {
 

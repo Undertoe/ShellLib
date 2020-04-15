@@ -8,6 +8,8 @@ class ShellCallbacks
 public:
     ShellCallbacks() = default;
 
+    virtual void EchoCallback(const std::string & echo) = 0;
+
     virtual void ScritpLinePlayback(const std::string & output) = 0;
 
     virtual void OutputCallback(const std::string & output) = 0;
