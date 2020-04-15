@@ -34,6 +34,9 @@ private:
         RunScript,
         ls,
         ChangeDirectory,
+        AliasSet,
+        AliasRun,
+        Comment,
         Unknown,
     };
 
@@ -44,7 +47,12 @@ private:
         { "run", RunScript },
         { "ls", ls },
         { "cd", ChangeDirectory},
+        { "alias", AliasSet },
+        { "#", Comment },
     };
+
+
+    std::map<std::string, std::string> _aliasMap;
 
 
     std::map<uint32_t, std::unique_ptr<VariableControlBase>> _vars;
@@ -60,6 +68,8 @@ private:
 
     int view_var(std::string_view line);
     int modify_var(std::string_view line);
+    int run_alias(std::string_view line);
+    int set_alias(std::string_view line);
 
     int change_directory(std::string_view line);
     int check_directory();

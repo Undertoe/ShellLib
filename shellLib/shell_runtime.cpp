@@ -24,6 +24,19 @@ int Terryn::ShellRuntime::ExecuteLine(std::string_view line)
         return change_directory(line);
         break;
 
+    case AliasSet:
+        return set_alias(line);
+        break;
+
+    case AliasRun:
+        return run_alias(line);
+        break;
+
+        /// skip over comments.
+    case Comment:
+        return 0;
+        break;
+
     case Unknown:
         error.SetError("Unknown type grabbed, exiting");
         return -1;
@@ -40,6 +53,11 @@ int Terryn::ShellRuntime::ExecuteLine(std::string_view line)
 
 Terryn::ShellRuntime::ProcessType Terryn::ShellRuntime::parse_for_type_of_execution(std::string_view line)
 {
+    if(line[0] == '#')
+    {
+        return Comment;
+    }
+
     auto split = StringHelpers::split(line, ' ');
     if(split.size() == 0)
     {
@@ -60,6 +78,18 @@ Terryn::ShellRuntime::ProcessType Terryn::ShellRuntime::parse_for_type_of_execut
             return value;
         }
     }
+
+    /// loop to see if the key is in the _aliasMap
+    /// if found, simply return AliasRun.  We will
+    /// run this again later.
+    for(auto & [alias, toRun] : _aliasMap)
+    {
+        if(alias == keyToSearch)
+        {
+            return AliasRun;
+        }
+    }
+
     return Unknown;
 }
 
@@ -298,4 +328,65 @@ int Terryn::ShellRuntime::check_directory()
 std::experimental::filesystem::path Terryn::ShellRuntime::CurrentPath() const
 {
     return _localDir;
+}
+
+int Terryn::ShellRuntime::set_alias(std::string_view line)
+{
+    auto split = StringHelpers::split(line, ' ');
+    if(split.size() < 3)
+    {
+        error.SetError("Invalid alias set: " + std::string(line));
+        return -1;
+    }
+
+    if(split[0] != "alias")
+    {
+        error.SetError("Invalid Alias called: " + std::string(line));
+        return -1;
+    }
+
+
+    if(StringHelpers::count_delims(line, '\"') != 2)
+    {
+        error.SetError("Cannot find a quoted item in line: " + std::string(line));
+        return -1;
+    }
+
+    std::string aliasedPhrase = std::string(StringHelpers::find_between_delims(line, '\"'));
+    std::string aliasWord = split[1];
+
+    if(aliasedPhrase.size() == 0)
+    {
+        error.SetError("Invalid alias phrase acquired: " + std::string(line));
+        return -1;
+    }
+
+    if(aliasWord.size() == 0)
+    {
+        error.SetError("Alias word has zero size: " + std::string(line));
+        return -1;
+    }
+
+    _aliasMap[aliasWord] = aliasedPhrase;
+
+    return 0;
+}
+
+int Terryn::ShellRuntime::run_alias(std::string_view line)
+{
+    if(_aliasMap.find(std::string(line)) == _aliasMap.end())
+    {
+        error.SetError("Called alias run and cannot find line to run: " + std::string(line));
+        return -1;
+    }
+
+    auto toRun = _aliasMap.at(std::string(line));
+
+    if(toRun.size() == 0)
+    {
+        error.SetError("Alias to run found is a blank string");
+        return -1;
+    }
+
+    return ExecuteLine(toRun);
 }

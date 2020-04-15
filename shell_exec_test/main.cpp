@@ -21,13 +21,13 @@ struct Struc1
 
     int Print1(const std::string & args)
     {
-        std::cout << "1" << std::endl;
+        std::cout << "1: " << args <<  std::endl;
         return 0;
     }
 
     int Print2(const std::string & args)
     {
-        std::cout << "2" << std::endl;
+        std::cout << "2: " << args << std::endl;
         return 0;
     }
 };
@@ -40,13 +40,13 @@ struct Struc2
     float d = 4.4;
     int Print3(const std::string & args)
     {
-        std::cout << "3" << std::endl;
+        std::cout << "3: " << args << std::endl;
         return 0;
     }
 
     int Print4(const std::string & args)
     {
-        std::cout << "4 " << args << std::endl;
+        std::cout << "4: " << args << std::endl;
         return 0;
     }
 };
@@ -60,7 +60,7 @@ struct Struc3
     double six = 6.6;
     int Print5(const std::string & args)
     {
-        std::cout << "5" << std::endl;
+        std::cout << "5: " << args << std::endl;
         return 0;
     }
 
@@ -176,9 +176,6 @@ int main()
     }
     std::cout << "Acquiring: " << key << " = " << *vars.Get(key) << std::endl;
 
-
-//    VariableControl* tmpControl = new VariableControl(&one, &two, &three);
-//    std::unique_ptr<VariableControlBase> varControl = std::make_unique<VariableControl>(&one, &two, &three);
 
 
     return 0;

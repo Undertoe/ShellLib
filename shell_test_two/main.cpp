@@ -253,6 +253,12 @@ int main()
     }
 
 
+    script = "/home/terryn/sandbox/testData/aliasTest.g4sh";
+    if(runtime.ExecuteScript(script) < 0)
+    {
+        std::cout << "error: " << runtime.error.GetError().value_or("Unknown error") << std::endl;
+    }
+
 
 
     return 0;
