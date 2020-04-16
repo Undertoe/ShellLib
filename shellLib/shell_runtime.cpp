@@ -262,6 +262,22 @@ int Terryn::ShellRuntime::modify_var(std::string_view line)
 
 int Terryn::ShellRuntime::ExecuteScript(std::string_view line)
 {
+    fs::path initialPath = fs_helpers::VerifyExtention(line, ".g4sh");
+
+
+
+    /// next bit of logic sets up the correct file name and path to get to it.
+    if(!fs_helpers::ContainedLocally(initialPath.c_str(), _localDir.c_str()))
+    {
+        if(fs_helpers::ContainedInLocalDir(initialPath.c_str(), _localDir.c_str(), "Scripts"))
+        {
+           fs::path tmp = _localDir;
+           tmp /= "Scripts";
+           tmp /= initialPath;
+           initialPath = tmp;
+        }
+    }
+
     std::ifstream inputFile;
     inputFile.open(std::string(line));
     if(!inputFile.is_open())
@@ -324,6 +340,13 @@ int Terryn::ShellRuntime::check_directory()
         error.SetError(e.what());
         return -1;
     }
+
+    return 0;
+}
+
+int Terryn::ShellRuntime::print_current_directory()
+{
+    _callback->PWDCallback(std::string(this->_localDir));
 
     return 0;
 }

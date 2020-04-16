@@ -12,3 +12,5 @@ INCLUDEPATH += $$PWD/../shellLib
 DEPENDPATH += $$PWD/../shellLib
 
 unix:!macx: PRE_TARGETDEPS += $$OUT_PWD/../shellLib/libshellLib.a
+
+LIBS += -lstdc++fs

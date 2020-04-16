@@ -7,6 +7,7 @@ CONFIG += thread
 CONFIG -= qt
 CONFIG += c++1z
 
+
 HEADERS += \
         tst_split.h
 
@@ -25,3 +26,6 @@ else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../stri
 else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../string_helpers/release/string_helpers.lib
 else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../string_helpers/debug/string_helpers.lib
 else:unix: PRE_TARGETDEPS += $$OUT_PWD/../string_helpers/libstring_helpers.a
+
+
+LIBS += -lstdc++fs

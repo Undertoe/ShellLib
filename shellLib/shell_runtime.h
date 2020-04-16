@@ -14,6 +14,7 @@
 #include "ShellCallbacks.h"
 
 #include "string_helpers.h"
+#include "fs_helpers.h"
 #include "error.h"
 
 namespace Terryn {
@@ -76,7 +77,14 @@ private:
 
     int change_directory(std::string_view line);
     int check_directory();
+    int print_current_directory();
 
+    /// ****************************************
+    /// FS helpers for navigating the filesystem
+    /// ****************************************
+
+    /// Returns the string_view with .g4sh appended
+    std::string VerifyFileName(std::string_view file) const;
 
 public:
 

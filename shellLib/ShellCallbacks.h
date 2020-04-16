@@ -17,6 +17,7 @@ public:
 
     virtual void LSCallBack(const std::string & output) = 0;
     virtual void CDCallBack(const std::string & output, bool successful) = 0;
+    virtual void PWDCallback(const std::string & output) = 0;
 };
 
 #endif // SHELLCALLBACKS_H

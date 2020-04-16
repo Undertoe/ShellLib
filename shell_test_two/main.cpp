@@ -142,6 +142,11 @@ public:
     {
 
     }
+
+    virtual void PWDCallback(const std::string &output) override
+    {
+        std::cout << output << std::endl;
+    }
 };
 
 
