@@ -40,6 +40,7 @@ private:
         AliasRun,
         Comment,
         Echo,
+        CallFunction,
         Unknown,
     };
 
@@ -54,6 +55,7 @@ private:
         { "alias", AliasSet },
         { "#", Comment },
         { "echo", Echo },
+        { "call", CallFunction },
     };
 
 
@@ -81,6 +83,8 @@ private:
     int check_directory();
     int print_current_directory();
 
+    int call_funciton(std::string_view line);
+
     /// ****************************************
     /// FS helpers for navigating the filesystem
     /// ****************************************
@@ -90,6 +94,7 @@ private:
 
 
     std::optional<fs::path> acquire_absolute_path(std::string_view potential_file);
+
 
 public:
 

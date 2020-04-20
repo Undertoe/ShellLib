@@ -5,14 +5,14 @@
 #include <string_view>
 #include <experimental/filesystem>
 
-namespace fs_helpers
+namespace FSHelpers
 {
     namespace fs = std::experimental::filesystem;
 
-    bool AbsolutePath(std::string_view path);
-    fs::path VerifyExtention(std::string_view filename, std::string_view extention);
-    bool ContainedLocally(fs::path currentDir, std::string_view fileName);
-    bool ContainedInLocalDir(fs::path currentDir, std::string_view fileName, std::string_view dirName);
+    bool absolute_path(std::string_view path);
+    fs::path verify_extention(std::string_view filename, std::string_view extention);
+    bool contained_locally(fs::path currentDir, std::string_view fileName);
+    bool contained_in_local_dir(fs::path currentDir, std::string_view fileName, std::string_view dirName);
 
 };
 

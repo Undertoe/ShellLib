@@ -67,8 +67,8 @@ TEST(FS, file_system_checks)
     std::cout << checkPath << ": " << std::boolalpha << checkPath.has_parent_path() << std::endl;
     std::cout << anotherPath << ": " << std::boolalpha << anotherPath.has_parent_path() << std::endl;
 
-    EXPECT_TRUE(fs_helpers::AbsolutePath(checkPath.c_str()));
-    EXPECT_EQ(fs_helpers::AbsolutePath(anotherPath.c_str()), false);
+    EXPECT_TRUE(FSHelpers::absolute_path(checkPath.c_str()));
+    EXPECT_EQ(FSHelpers::absolute_path(anotherPath.c_str()), false);
 }
 
 TEST(FS, verify_extention)
@@ -77,9 +77,9 @@ TEST(FS, verify_extention)
     fs::path checkWithExtention = "aliasTest.g4sh";
     fs::path checkNoExtention = "aliasTest";
 
-    EXPECT_EQ(checkWithExtention, fs_helpers::VerifyExtention(checkWithExtention.c_str(), ".g4sh"));
-    EXPECT_EQ(checkWithExtention, fs_helpers::VerifyExtention(checkNoExtention.c_str(), ".g4sh"));
-    std::cout << fs_helpers::VerifyExtention(checkNoExtention.c_str(), ".g4sh") << std::endl;
+    EXPECT_EQ(checkWithExtention, FSHelpers::verify_extention(checkWithExtention.c_str(), ".g4sh"));
+    EXPECT_EQ(checkWithExtention, FSHelpers::verify_extention(checkNoExtention.c_str(), ".g4sh"));
+    std::cout << FSHelpers::verify_extention(checkNoExtention.c_str(), ".g4sh") << std::endl;
 }
 
 
@@ -92,11 +92,11 @@ TEST(FS, contained_locally)
     std::string_view scriptsFile = "NEW.g4sh";
     std::string_view currentPathFile = "testScript.g4sh";
 
-    EXPECT_TRUE(fs_helpers::ContainedLocally(currentPath, currentPathFile));
+    EXPECT_TRUE(FSHelpers::contained_locally(currentPath, currentPathFile));
     fs::path extendedPath = currentPath;
     extendedPath /= scriptsDir;
-    EXPECT_TRUE(fs_helpers::ContainedLocally(extendedPath, scriptsFile));
-    EXPECT_TRUE(fs_helpers::ContainedInLocalDir(currentPath, scriptsFile, scriptsDir));
+    EXPECT_TRUE(FSHelpers::contained_locally(extendedPath, scriptsFile));
+    EXPECT_TRUE(FSHelpers::contained_in_local_dir(currentPath, scriptsFile, scriptsDir));
 
 }
 

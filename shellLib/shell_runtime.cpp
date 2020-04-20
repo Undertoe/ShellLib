@@ -45,6 +45,10 @@ int Terryn::ShellRuntime::ExecuteLine(std::string_view line)
         return run_echo(line);
         break;
 
+    case CallFunction:
+        return call_funciton(line);
+        break;
+
     case Unknown:
         error.SetError("Unknown type grabbed, exiting");
         return -1;
@@ -266,7 +270,7 @@ int Terryn::ShellRuntime::modify_var(std::string_view line)
 
 std::optional<std::experimental::filesystem::path> Terryn::ShellRuntime::acquire_absolute_path(std::string_view potential_file)
 {
-    fs::path initialPath = fs_helpers::VerifyExtention(potential_file, ".g4sh");
+    fs::path initialPath = FSHelpers::verify_extention(potential_file, ".g4sh");
 
     /// immediately return the absolute path
     if(initialPath.is_absolute())
@@ -274,12 +278,12 @@ std::optional<std::experimental::filesystem::path> Terryn::ShellRuntime::acquire
         return initialPath;
     }
 
-    if(fs_helpers::ContainedLocally(_localDir, initialPath.c_str()))
+    if(FSHelpers::contained_locally(_localDir, initialPath.c_str()))
     {
         return (_localDir / initialPath);
     }
 
-    if(fs_helpers::ContainedInLocalDir(_localDir, "Scripts", initialPath.c_str()))
+    if(FSHelpers::contained_in_local_dir(_localDir, "Scripts", initialPath.c_str()))
     {
         return (_localDir / "Scripts"/ initialPath);
     }
@@ -316,13 +320,21 @@ int Terryn::ShellRuntime::ExecuteScript(std::string_view line)
 
     std::string file((std::istreambuf_iterator<char>(inputFile)), std::istreambuf_iterator<char>());
     auto lines = StringHelpers::split(file, '\n');
+    int lineCounter = 0;
     for(const auto & line : lines)
     {
+        lineCounter++;
         if(line.size() != 0)
         {
             _callback->ScritpLinePlayback(line);
             if(this->ExecuteLine(line) < 0)
             {
+                auto currentError = error.GetError();
+                error.SetError("Error on line: " + std::to_string(lineCounter));
+                if(currentError)
+                {
+                    error.AppendError(*currentError);
+                }
                 return -1;
             }
         }
@@ -493,4 +505,36 @@ int Terryn::ShellRuntime::run_echo(std::string_view line)
 
     _callback->EchoCallback(echoLine);
     return 0;
+}
+
+int Terryn::ShellRuntime::call_funciton(std::string_view line)
+{
+    auto split = StringHelpers::split(line, ' ');
+
+    std::string args = "";
+    if(split.size() == 1)
+    {
+        error.SetError("no function present: " + std::string(line));
+        return -1;
+    }
+    std::string funcCall = split[1];
+    if(split.size() > 2)
+    {
+        for(uint32_t i = 2; i < split.size(); i ++)
+        {
+            args += split[i];
+            args += " ";
+        }
+    }
+
+    for(auto & func : this->_funcs)
+    {
+        auto a = func->Call(funcCall, args);
+        if(a > -1)
+        {
+            return a;
+        }
+    }
+    error.SetError("Couldn not find function in line: " + std::string(line));
+    return -1;
 }
