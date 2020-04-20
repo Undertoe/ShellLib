@@ -37,3 +37,14 @@ std::string_view StringHelpers::find_between_delims(std::string_view line, char 
     auto last = line.find_last_of(delim);
     return line.substr(first + 1, last - first - 1);
 }
+
+
+std::optional<std::string> StringHelpers::trim_substr_front(std::string_view line, std::string_view substr)
+{
+    if(line.substr(0,  substr.size()) != substr)
+    {
+        return std::nullopt;
+    }
+
+    return std::string(line.substr(substr.size(), line.size()));
+}

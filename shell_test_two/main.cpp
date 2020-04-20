@@ -269,6 +269,37 @@ int main()
         std::cout << "error: " << runtime.error.GetError().value_or("Unknown error") << std::endl;
     }
 
+    std::cout << "\n\n\n\nBeginning directory testing" << std::endl;
+    line = "cd /home/terryn/sandbox/testData";
+    if(runtime.ExecuteLine(line) < 0)
+    {
+        std::cout << "error: " << runtime.error.GetError().value_or("Unknown error") << std::endl;
+    }
+
+    line = "ls";
+    if(runtime.ExecuteLine(line) < 0)
+    {
+        std::cout << "error: " << runtime.error.GetError().value_or("Unknown error") << std::endl;
+    }
+
+    line = "cd ..";
+    if(runtime.ExecuteLine(line) < 0)
+    {
+        std::cout << "error: " << runtime.error.GetError().value_or("Unknown error") << std::endl;
+    }
+
+    line = "pwd";
+    if(runtime.ExecuteLine(line) < 0)
+    {
+        std::cout << "error: " << runtime.error.GetError().value_or("Unknown error") << std::endl;
+    }
+
+    line = "ls";
+    if(runtime.ExecuteLine(line) < 0)
+    {
+        std::cout << "error: " << runtime.error.GetError().value_or("Unknown error") << std::endl;
+    }
+
 
 
     return 0;

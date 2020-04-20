@@ -18,12 +18,11 @@ fs_helpers::fs::path fs_helpers::VerifyExtention(std::string_view fileName, std:
 }
 
 
-bool fs_helpers::ContainedLocally(std::string_view fileName, std::string_view currentDir)
+bool fs_helpers::ContainedLocally(fs::path currentDir, std::string_view fileName)
 {
-    fs::path tmp(currentDir);
-    for(const auto & item : fs::directory_iterator(tmp))
+    for(const auto & item : fs::directory_iterator(currentDir))
     {
-        if(item == fileName)
+        if(item.path().filename() == fileName)
         {
             return true;
         }
@@ -31,7 +30,7 @@ bool fs_helpers::ContainedLocally(std::string_view fileName, std::string_view cu
     return false;
 }
 
-bool fs_helpers::ContainedInLocalDir(std::string_view fileName, std::string_view currentDir, std::string_view dirName)
+bool fs_helpers::ContainedInLocalDir(fs::path currentDir, std::string_view fileName, std::string_view dirName)
 {
     fs::path path = currentDir;
     path /= dirName;
@@ -41,7 +40,7 @@ bool fs_helpers::ContainedInLocalDir(std::string_view fileName, std::string_view
     }
     for(const auto & item : fs::directory_iterator(path))
     {
-        if(item == fileName)
+        if(item.path().filename() == fileName)
         {
             return true;
         }

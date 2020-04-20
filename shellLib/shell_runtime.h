@@ -35,6 +35,7 @@ private:
         RunScript,
         ls,
         ChangeDirectory,
+        CheckCurrentDirectory,
         AliasSet,
         AliasRun,
         Comment,
@@ -49,6 +50,7 @@ private:
         { "run", RunScript },
         { "ls", ls },
         { "cd", ChangeDirectory},
+        { "pwd", CheckCurrentDirectory},
         { "alias", AliasSet },
         { "#", Comment },
         { "echo", Echo },
@@ -85,6 +87,9 @@ private:
 
     /// Returns the string_view with .g4sh appended
     std::string VerifyFileName(std::string_view file) const;
+
+
+    std::optional<fs::path> acquire_absolute_path(std::string_view potential_file);
 
 public:
 

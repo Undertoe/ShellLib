@@ -24,6 +24,10 @@ int Terryn::ShellRuntime::ExecuteLine(std::string_view line)
         return change_directory(line);
         break;
 
+    case CheckCurrentDirectory:
+        return print_current_directory();
+        break;
+
     case AliasSet:
         return set_alias(line);
         break;
@@ -260,26 +264,49 @@ int Terryn::ShellRuntime::modify_var(std::string_view line)
     return 0;
 }
 
-int Terryn::ShellRuntime::ExecuteScript(std::string_view line)
+std::optional<std::experimental::filesystem::path> Terryn::ShellRuntime::acquire_absolute_path(std::string_view potential_file)
 {
-    fs::path initialPath = fs_helpers::VerifyExtention(line, ".g4sh");
+    fs::path initialPath = fs_helpers::VerifyExtention(potential_file, ".g4sh");
 
-
-
-    /// next bit of logic sets up the correct file name and path to get to it.
-    if(!fs_helpers::ContainedLocally(initialPath.c_str(), _localDir.c_str()))
+    /// immediately return the absolute path
+    if(initialPath.is_absolute())
     {
-        if(fs_helpers::ContainedInLocalDir(initialPath.c_str(), _localDir.c_str(), "Scripts"))
-        {
-           fs::path tmp = _localDir;
-           tmp /= "Scripts";
-           tmp /= initialPath;
-           initialPath = tmp;
-        }
+        return initialPath;
     }
 
+    if(fs_helpers::ContainedLocally(_localDir, initialPath.c_str()))
+    {
+        return (_localDir / initialPath);
+    }
+
+    if(fs_helpers::ContainedInLocalDir(_localDir, "Scripts", initialPath.c_str()))
+    {
+        return (_localDir / "Scripts"/ initialPath);
+    }
+
+    return std::nullopt;
+}
+
+int Terryn::ShellRuntime::ExecuteScript(std::string_view line)
+{
+    auto mPath = acquire_absolute_path(line);
+
+    if(!mPath)
+    {
+        error.SetError("Ill formed file or does not exist: " + std::string(line));
+        return -1;
+    }
+
+    auto path = *mPath;
+    if(!fs::exists(path))
+    {
+        error.SetError("file not found");
+        return -1;
+    }
+
+
     std::ifstream inputFile;
-    inputFile.open(std::string(line));
+    inputFile.open(std::string(path));
     if(!inputFile.is_open())
     {
         error.SetError("File failed to open: " + std::string(line));
@@ -306,15 +333,45 @@ int Terryn::ShellRuntime::ExecuteScript(std::string_view line)
 
 int Terryn::ShellRuntime::change_directory(std::string_view line)
 {
-    auto split = StringHelpers::split(line, ' ');
-    if(split.size() != 2)
+    auto mStr = StringHelpers::trim_substr_front(line, "cd ");
+
+    if(!mStr)
     {
         error.SetError("Invalid line: " + std::string(line));
         return -1;
     }
+
     try
     {
-        _localDir /= split[1];
+
+        std::string p = *mStr;
+
+
+        if(fs::path(p).is_absolute())
+        {
+            if(!fs::exists(p))
+            {
+                error.SetError("Path does not exist: " + std::string(p.c_str()));
+                return -1;
+            }
+
+            _localDir = p;
+            return 0;
+        }
+
+        if(p == "..")
+        {
+            fs::path tmp = _localDir.parent_path();
+            if(!fs::exists(tmp))
+            {
+                error.SetError("parent path does not exist: " + std::string(_localDir));
+                return -1;
+            }
+            _localDir = tmp;
+            return 0;
+        }
+
+        _localDir /= p;
     }
     catch(std::exception & e)
     {

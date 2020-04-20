@@ -46,6 +46,17 @@ TEST(StringHelpers, find_between_delims)
 }
 
 
+TEST(StringHelpers, trim_substr_front)
+{
+    std::string test = "Hello, \"This is a quoted string.\"";
+
+    auto substr = StringHelpers::trim_substr_front(test, "Hello, ");
+
+
+    EXPECT_TRUE(substr);
+    EXPECT_EQ(*substr, "\"This is a quoted string.\"");
+}
+
 TEST(FS, file_system_checks)
 {
     namespace fs = std::experimental::filesystem;
@@ -80,6 +91,12 @@ TEST(FS, contained_locally)
 
     std::string_view scriptsFile = "NEW.g4sh";
     std::string_view currentPathFile = "testScript.g4sh";
+
+    EXPECT_TRUE(fs_helpers::ContainedLocally(currentPath, currentPathFile));
+    fs::path extendedPath = currentPath;
+    extendedPath /= scriptsDir;
+    EXPECT_TRUE(fs_helpers::ContainedLocally(extendedPath, scriptsFile));
+    EXPECT_TRUE(fs_helpers::ContainedInLocalDir(currentPath, scriptsFile, scriptsDir));
 
 }
 
